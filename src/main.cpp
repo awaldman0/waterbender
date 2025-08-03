@@ -11,6 +11,7 @@
 unsigned int shaderProgram{};
 glm::mat4 rotationMatrix = glm::mat4(1.0f);
 
+
 constexpr auto vertexShaderSource = R"(
     #version 330 core
     
@@ -70,7 +71,7 @@ int main()
     const auto ScreenHeight = VideoMode->height;
 
     GLFWwindow *window = glfwCreateWindow(ScreenHeight / 2, ScreenHeight / 2,
-                                          "OpenGL + GLFW", NULL, NULL);
+                                          "Waterbender", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
