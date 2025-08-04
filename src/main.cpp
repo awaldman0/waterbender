@@ -4,13 +4,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "container.h"
 
 #include <array>
 #include <iostream>
+using namespace std;
 
 unsigned int shaderProgram{};
 glm::mat4 rotationMatrix = glm::mat4(1.0f);
-
+Container container;
 
 constexpr auto vertexShaderSource = R"(
     #version 330 core
@@ -36,16 +38,16 @@ constexpr auto fragmentShaderSource = R"(
 )";
 
 // vertices duplicated for GL_LINES
-constexpr auto squareVertices = std::array{
-    -0.5f, 0.5f, 0.0f,  // Top-left
-    0.5f, 0.5f, 0.0f,   // Top-right
-    0.5f, 0.5f, 0.0f,   // Top-right
-    0.5f, -0.5f, 0.0f,  // Bottom-right
-    0.5f, -0.5f, 0.0f,  // Bottom-right
-    -0.5f, -0.5f, 0.0f, // Bottom-left
-    -0.5f, -0.5f, 0.0f, // Bottom-left
-    -0.5f, 0.5f, 0.0f   // Top-left
-};
+//auto squareVertices = std::array{
+//    -0.5f, 0.5f, 0.0f,  // Top-left
+//    0.5f, 0.5f, 0.0f,   // Top-right
+//    0.5f, 0.5f, 0.0f,   // Top-right
+//    0.5f, -0.5f, 0.0f,  // Bottom-right
+//    0.5f, -0.5f, 0.0f,  // Bottom-right
+//    -0.5f, -0.5f, 0.0f, // Bottom-left
+//    -0.5f, -0.5f, 0.0f, // Bottom-left
+//    -0.5f, 0.5f, 0.0f   // Top-left
+//};
 
 void framebufferSizeChanged(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
@@ -138,12 +140,13 @@ int main()
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER,
-                 squareVertices.size() * sizeof(float),
-                 squareVertices.data(),
+                 container.vertices.size() * sizeof(float),
+                 container.vertices.data(),
                  GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    glEnable(GL_DEPTH_TEST);
 
     glfwSetFramebufferSizeCallback(window, framebufferSizeChanged);
 
@@ -182,28 +185,43 @@ void processInput(GLFWwindow *window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
         rotationMatrix = glm::rotate(rotationMatrix,
-                                     glm::radians(rotationAnglePerFrame),
-                                     glm::vec3(0.0f, 0.0f, 1.0f));
+                                     glm::radians(-rotationAnglePerFrame),
+                                     glm::vec3(0.0f, 1.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
         rotationMatrix = glm::rotate(rotationMatrix,
-                                     glm::radians(-rotationAnglePerFrame),
-                                     glm::vec3(0.0f, 0.0f, 1.0f));
+                                     glm::radians(rotationAnglePerFrame),
+                                     glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                    glm::radians(rotationAnglePerFrame),
+                                    glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                    glm::radians(-rotationAnglePerFrame),
+                                    glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) 
+    {
+        rotationMatrix = glm::mat4(1.0f);
     }
 }
 
 void render(GLFWwindow *window)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
 
     auto location = glGetUniformLocation(shaderProgram, "rotationMatrix");
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
 
-    glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(squareVertices.size() / 3));
-
+    glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(container.vertices.size() / 3));
     glfwSwapBuffers(window);
 }
