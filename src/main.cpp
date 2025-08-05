@@ -12,6 +12,11 @@ using namespace std;
 
 unsigned int shaderProgram{};
 glm::mat4 rotationMatrix = glm::mat4(1.0f);
+glm::vec3 cameraPos = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 up = glm::vec3(0.0f, 1.1f, 0.0f);
+
+glm::mat4 lookAtMatrix = glm::lookAt(cameraPos, cameraTarget, up);
 Container container;
 
 constexpr auto vertexShaderSource = R"(
@@ -19,10 +24,11 @@ constexpr auto vertexShaderSource = R"(
     
     layout (location = 0) in vec3 aPos;
     uniform mat4 rotationMatrix;
+    uniform mat4 lookAtMatrix;
 
     void main()
     {
-        gl_Position = rotationMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+        gl_Position =  rotationMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
     }
 )";
 
@@ -36,18 +42,6 @@ constexpr auto fragmentShaderSource = R"(
         FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
     }
 )";
-
-// vertices duplicated for GL_LINES
-//auto squareVertices = std::array{
-//    -0.5f, 0.5f, 0.0f,  // Top-left
-//    0.5f, 0.5f, 0.0f,   // Top-right
-//    0.5f, 0.5f, 0.0f,   // Top-right
-//    0.5f, -0.5f, 0.0f,  // Bottom-right
-//    0.5f, -0.5f, 0.0f,  // Bottom-right
-//    -0.5f, -0.5f, 0.0f, // Bottom-left
-//    -0.5f, -0.5f, 0.0f, // Bottom-left
-//    -0.5f, 0.5f, 0.0f   // Top-left
-//};
 
 void framebufferSizeChanged(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
@@ -219,9 +213,13 @@ void render(GLFWwindow *window)
 
     glUseProgram(shaderProgram);
 
-    auto location = glGetUniformLocation(shaderProgram, "rotationMatrix");
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    auto rotation_location = glGetUniformLocation(shaderProgram, "rotationMatrix");
+    glUniformMatrix4fv(rotation_location, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    auto lookAt_location = glGetUniformLocation(shaderProgram, "lookAtMatrix");
+    glUniformMatrix4fv(lookAt_location, 1, GL_FALSE, glm::value_ptr(lookAtMatrix));
+
 
     glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(container.vertices.size() / 3));
+    
     glfwSwapBuffers(window);
 }
