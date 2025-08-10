@@ -96,7 +96,7 @@ public:
 			this->velocity.z += gravity->z;
 		}
 		//check for particle-particle collisions
-		//particleCollision(particles);
+		particleCollision(particles);
 	
 
 	}
@@ -136,7 +136,14 @@ public:
 				(this->center.z - p->center.z) * (this->center.z - p->center.z);
 			float rsqaured = (this->radius + p->radius) * (this->radius + p->radius);
 			if (p != this && distsquared < rsqaured - FLT_EPSILON) {
-				//
+				Vector3D v_delta = this->velocity - p->velocity;
+				Vector3D n = this->center - p->center;
+				n.normalize();
+				float lambda = -dot(n, v_delta);
+				Vector3D impulse = lambda * n;
+				this->velocity += impulse;
+				p->velocity -= impulse;
+				this->center = p->center + n * (this->radius + p->radius + FLT_EPSILON);
 			}
 		}
 	}
