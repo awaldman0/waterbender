@@ -15,8 +15,6 @@ int num_particles = 125; //use perfect cubes to make life easier
 float particle_radius = 0.06;
 float drawing_radius = 0.02;
 glm::vec3 gravity = glm::vec3(0.0, -.000005, 0.0);
-//Vector3D gravity = Vector3D(0.0, 0.0, 0.0);
-
 
 // for mouse dragging
 bool gDragging = false;
@@ -339,6 +337,7 @@ void render(GLFWwindow *window, float deltaTime)
 
     glm::mat4 invRotation = glm::transpose(rotationMatrix);
     glm::vec4 grav_vector = invRotation * glm::vec4(gravity.x, gravity.y, gravity.z, 1.0);
+    //cout << grav_vector.x << " " << grav_vector.y << " " << grav_vector.z << endl;
     for (int i = 0; i < particles.size(); i++) {
         std::vector<float> curr;
         particles[i]->updatePosition(&grav_vector, &container, &invRotation, &particles, deltaTime);

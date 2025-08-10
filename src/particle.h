@@ -14,7 +14,7 @@ using namespace CGL;
 const float GRAV_CONST = 6.674e-11;
 const float GRAV_MULTIPLIER = 400;
 const float INFLUENCE_MULTIPLIER = 1.2f;
-const float BOUNCE_MULTIPLIER = -0.75;
+const float BOUNCE_MULTIPLIER = -0.6;
 
 glm::vec3 sphericalToCartesian(float r, float theta, float phi) {
 	float x = r * sin(theta) * cos(phi);
@@ -87,13 +87,24 @@ public:
 
 	void updatePosition(glm::vec4* gravity, Container* c, glm::mat4* invRotation, vector<Particle*>* particles, float deltaTime) {
 		//bounds checking
-		if (boundsCollision(c)) {
-			this->velocity = this->velocity * BOUNCE_MULTIPLIER;
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		if (boundsCollision(c, &x, &y, &z)) {
+			//reverse particle's direction in the axis of each boundary it violated
+			if (x == 1) {
+				this->velocity.x *= BOUNCE_MULTIPLIER;
+			}
+			if (y == 1) {
+				this->velocity.y *= BOUNCE_MULTIPLIER;
+			}
+			if (z == 1) {
+				this->velocity.z *= BOUNCE_MULTIPLIER;
+			}
 			this->velocity.x += gravity->x;
 			this->velocity.y += gravity->y;
 			this->velocity.z += gravity->z;
 			this->center += this->velocity;
-
 		}
 		else {
 			this->center += this->velocity;
@@ -107,32 +118,39 @@ public:
 
 	}
 
-	bool boundsCollision(Container* c) {
+	bool boundsCollision(Container* c, int* x, int* y, int* z) {
+		bool ret = false;
 		if (this->center.x + this->radius > c->width / 2 - FLT_EPSILON) {
 			this->center.x = c->width / 2 - FLT_EPSILON - this->radius;
-			return true;
+			*x = 1;
+			ret = true;
 		}
-		else if (this->center.x - this->radius < -(c->width / 2) + FLT_EPSILON) {
+		if (this->center.x - this->radius < -(c->width / 2) + FLT_EPSILON) {
 			this->center.x = -(c->width / 2) + FLT_EPSILON + this->radius;
-			return true;
+			*x = 1;
+			ret = true;
 		}
-		else if (this->center.y + this->radius > c->height / 2 - FLT_EPSILON) {
+		if (this->center.y + this->radius > c->height / 2 - FLT_EPSILON) {
 			this->center.y = c->height / 2 - FLT_EPSILON - this->radius;
-			return true;
+			*y = 1;
+			ret = true;
 		}
-		else if (this->center.y - this->radius < -(c->height / 2) + FLT_EPSILON) {
+		if (this->center.y - this->radius < -(c->height / 2) + FLT_EPSILON) {
 			this->center.y = -(c->height / 2) + FLT_EPSILON + this->radius;
-			return true;
+			*y = 1;
+			ret = true;
 		}
-		else if (this->center.z + this->radius > c->length / 2 - FLT_EPSILON) {
+		if (this->center.z + this->radius > c->length / 2 - FLT_EPSILON) {
 			this->center.z = c->length / 2 - FLT_EPSILON - this->radius;
-			return true;
+			*z = 1;
+			ret = true;
 		}
-		else if (this->center.z - this->radius < -(c->length / 2) + FLT_EPSILON) {
+		if (this->center.z - this->radius < -(c->length / 2) + FLT_EPSILON) {
 			this->center.z = -(c->length / 2) + FLT_EPSILON + this->radius;
-			return true;
+			*z = 1;
+			ret = true;
 		}
-		return false;
+		return ret;
 	}
 
 	void particleCollision(vector<Particle*>* particles) {
@@ -148,7 +166,6 @@ public:
 				n.normalize();
 				float lambda = -dot(n, v_delta);
 				Vector3D impulse = lambda * n;
-				Vector3D grav_force = n * (GRAV_CONST / rsqaured) * 10;
 				this->velocity += impulse;
 				p->velocity -= impulse;
 				this->center = p->center + n * (this->radius + p->radius + FLT_EPSILON);
