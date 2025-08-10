@@ -16,6 +16,13 @@ float particle_radius = 0.05;
 glm::vec3 gravity = glm::vec3(0.0, -.000005, 0.0);
 //Vector3D gravity = Vector3D(0.0, 0.0, 0.0);
 
+
+// for mouse dragging
+bool gDragging = false;
+double gLastX = 0.0, gLastY = 0.0;
+float gSensitivity = 0.25f;
+
+
 unsigned int shaderProgram{};
 glm::mat4 rotationMatrix = glm::mat4(1.0f);
 Container container;
@@ -51,6 +58,12 @@ constexpr auto fragmentShaderSource = R"(
 void framebufferSizeChanged(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window, float deltaTime);
 void render(GLFWwindow *window, float deltaTime);
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void addOneParticle();
+void removeLastParticle();
+
 
 void initializeParticles() {
     //free memory associated with current particles if any 
@@ -130,6 +143,9 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetCursorPosCallback(window, cursorPosCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     if (glewInit() != GLEW_OK)
     {
@@ -207,7 +223,52 @@ int main()
     glfwTerminate();
     return 0;
 }
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            gDragging = true;
+            glfwGetCursorPos(window, &gLastX, &gLastY);
+            
+        }
+        else if (action == GLFW_RELEASE) {
+            gDragging = false;
+            
+        }
+    }
+}
 
+void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    if (!gDragging) return;
+    double dx = xpos - gLastX;
+    double dy = ypos - gLastY;
+    gLastX = xpos; gLastY = ypos;
+    float yawDeg = gSensitivity * static_cast<float>(dx);
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(yawDeg), glm::vec3(0.f, 1.f, 0.f));
+    float pitchDeg = gSensitivity * static_cast<float>(dy);
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(pitchDeg), glm::vec3(1.f, 0.f, 0.f));
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    if (yoffset > 0.0) {
+        addOneParticle();
+    }
+    else if (yoffset < 0.0) {
+        removeLastParticle();
+    }
+}
+void addOneParticle() {
+
+    Particle* p = new Particle(0.0f, 0.0f, 0.0f, particle_radius);
+    particles.push_back(p);
+    num_particles = static_cast<int>(particles.size());
+}
+
+void removeLastParticle() {
+    if (particles.empty()) return;
+    delete particles.back();
+    particles.pop_back();
+    num_particles = static_cast<int>(particles.size());
+}
 void framebufferSizeChanged(GLFWwindow *window, int width, int height)
 {
     float currentFrameStartTime = static_cast<float>(glfwGetTime());
