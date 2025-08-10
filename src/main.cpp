@@ -12,7 +12,8 @@
 using namespace std;
 
 int num_particles = 125; //use perfect cubes to make life easier
-float particle_radius = 0.05;
+float particle_radius = 0.06;
+float drawing_radius = 0.02;
 glm::vec3 gravity = glm::vec3(0.0, -.000005, 0.0);
 //Vector3D gravity = Vector3D(0.0, 0.0, 0.0);
 
@@ -72,7 +73,7 @@ void initializeParticles() {
     }
 
     if (num_particles == 1) {
-        Particle* p = new Particle(0.0, 0.0, 0.0, particle_radius);
+        Particle* p = new Particle(0.0, 0.0, 0.0, particle_radius, drawing_radius);
         particles.push_back(p);
         return;
     }
@@ -89,7 +90,7 @@ void initializeParticles() {
         for (float i = min_x; i <= max_x; i += 2 * particle_radius) {
             for (float j = min_y; j <= max_y; j += 2 * particle_radius) {
                 for (float k = min_z; k <= max_z; k += 2 * particle_radius) {
-                    Particle* p = new Particle(i, j, k, particle_radius);
+                    Particle* p = new Particle(i, j, k, particle_radius, drawing_radius);
                     particles.push_back(p);
                 }
             }
@@ -105,7 +106,7 @@ void initializeParticles() {
         for (float i = min_x; i <= max_x; i += 2 * particle_radius) {
             for (float j = min_y; j <= max_y; j += 2 * particle_radius) {
                 for (float k = min_z; k <= max_z; k += 2 * particle_radius) {
-                    Particle* p = new Particle(i, j, k, particle_radius);
+                    Particle* p = new Particle(i, j, k, particle_radius, drawing_radius);
                     particles.push_back(p);
                 }
             }
@@ -257,8 +258,8 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     }
 }
 void addOneParticle() {
-
-    Particle* p = new Particle(0.0f, 0.0f, 0.0f, particle_radius);
+    //generate particle in a random location where x, y, and z are in the range [-0.1, 0.1]
+    Particle* p = new Particle((((float)rand() / (RAND_MAX)) / 5) - 0.1f, (((float)rand() / (RAND_MAX)) / 5) - 0.1f, (((float)rand() / (RAND_MAX)) / 5) - 0.1f, particle_radius, drawing_radius);
     particles.push_back(p);
     num_particles = static_cast<int>(particles.size());
 }
@@ -349,7 +350,7 @@ void render(GLFWwindow *window, float deltaTime)
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
-        glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(curr.size() / 3));
+        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(curr.size() / 3));
     }
 
     glfwSwapBuffers(window);
