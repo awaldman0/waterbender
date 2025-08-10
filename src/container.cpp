@@ -1,6 +1,7 @@
 #include "container.h"
 
 using namespace std;
+using namespace CGL;
 
 void Container::setLength(float l) {
 	this->length = l;
