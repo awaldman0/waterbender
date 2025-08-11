@@ -18,6 +18,7 @@
 
 using std::vector;
 
+<<<<<<< HEAD
 int   num_particles = 125;
 float particle_radius = 0.06f;
 float drawing_radius = 0.02f;
@@ -25,6 +26,12 @@ glm::vec3 gravity = glm::vec3(0.0f, -0.001f, 0.0f);
 
 int   k_neighbors = 4;
 float max_edge_dist = 0.35f;
+=======
+int num_particles = 125; //use perfect cubes to make life easier
+float particle_radius = 0.06;
+float drawing_radius = 0.02;
+glm::vec3 gravity = glm::vec3(0.0, -.000005, 0.0);
+>>>>>>> 2579bf8221f6876b715f34a7a0db0678eec93bbe
 
 const float POS_ALPHA = 0.12f;   // 0..1, smaller -> more lag
 const float NORM_ALPHA = 0.20f;   // EMA for normals
@@ -473,3 +480,85 @@ void processInput(GLFWwindow* window, float dt) {
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) rotationMatrix = glm::rotate(rotationMatrix, glm::radians(-speed), glm::vec3(1, 0, 0));
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) rotationMatrix = glm::mat4(1.0f);
 }
+<<<<<<< HEAD
+=======
+
+void processInput(GLFWwindow *window, float deltaTime)
+{
+    const float rotationSpeedDegreesPerSecond = 90.0f;
+    const float rotationAnglePerFrame = rotationSpeedDegreesPerSecond * deltaTime;
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                     glm::radians(-rotationAnglePerFrame),
+                                     glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                     glm::radians(rotationAnglePerFrame),
+                                     glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                    glm::radians(rotationAnglePerFrame),
+                                    glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        rotationMatrix = glm::rotate(rotationMatrix,
+                                    glm::radians(-rotationAnglePerFrame),
+                                    glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) 
+    {
+        rotationMatrix = glm::mat4(1.0f);
+    }
+}
+
+void render(GLFWwindow *window, float deltaTime)
+{
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(shaderProgram);
+
+    auto rotation_location = glGetUniformLocation(shaderProgram, "rotationMatrix");
+    glUniformMatrix4fv(rotation_location, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+        container.vertices.size() * sizeof(float),
+        container.vertices.data(),
+        GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(container.vertices.size() / 3));
+
+    glm::mat4 invRotation = glm::transpose(rotationMatrix);
+    glm::vec4 grav_vector = invRotation * glm::vec4(gravity.x, gravity.y, gravity.z, 1.0);
+    //cout << grav_vector.x << " " << grav_vector.y << " " << grav_vector.z << endl;
+    for (int i = 0; i < particles.size(); i++) {
+        std::vector<float> curr;
+        particles[i]->updatePosition(&grav_vector, &container, &invRotation, &particles, deltaTime);
+        particles[i]->draw(10, &curr, &invRotation);
+        glBufferData(GL_ARRAY_BUFFER,
+            curr.size() * sizeof(float),
+            curr.data(),
+            GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(curr.size() / 3));
+    }
+
+    glfwSwapBuffers(window);
+}
+
+>>>>>>> 2579bf8221f6876b715f34a7a0db0678eec93bbe
