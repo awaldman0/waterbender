@@ -14,3 +14,6 @@ _deps
 build.vs/
 *.vsidx
 NUL
+/.vs
+/out/build
+/CMakeSettings.json

@@ -1,4 +1,4 @@
-// main.cpp — Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
+// main.cpp - Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
 // Adds toggle: press 'P' to switch between shaded mesh and raw particle points.
 // GL 3.3 core (no immediate mode). Requires: GLEW, GLFW, GLM, your container.h, particle.h.
 
@@ -143,7 +143,7 @@ out vec4 FragColor;
 void main(){ FragColor = vec4(1.0); }
 )";
 
-// Particle points (GL_POINTS) — core profile compliant
+// Particle points (GL_POINTS) ?core profile compliant
 static const char* VS_points = R"(
 #version 330 core
 layout (location=0) in vec3 aPos;
