@@ -33,7 +33,8 @@ std::vector<std::vector<double>> U0[NDIM]; // velocity field
 std::vector<std::vector<double>> U1[NDIM]; // velocity field'
 std::vector<std::vector<double>> F[NDIM];
 
-// Fluid parameters
+
+parameters
 double viscosity = 0.001;
 double diffusionconstant = 0.0001;
 double dissipationrate = 0.01;
