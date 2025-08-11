@@ -308,7 +308,7 @@ int main() {
     const GLFWvidmode* vm = glfwGetVideoMode(glfwGetPrimaryMonitor());
     int H = vm ? vm->height : 900;
 
-    GLFWwindow* window = glfwCreateWindow(H / 2, H / 2, "Fluid (lagged triangles) + Box", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(H / 2, H / 2, "Waterbender", nullptr, nullptr);
     if (!window) { std::cerr << "Failed to create window\n"; glfwTerminate(); return -1; }
     glfwMakeContextCurrent(window);
 
@@ -364,10 +364,22 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    float last_fps_update = 0.0f;
+    int num_frames = 0;
+    float fps = 0.0f;
     while (!glfwWindowShouldClose(window)) {
         float now = static_cast<float>(glfwGetTime());
         float dt = now - lastFrameStartTime;
         lastFrameStartTime = now;
+
+        num_frames++;
+        if (now - last_fps_update >= 1.0) {
+            fps = (float)num_frames / (now - last_fps_update);
+            last_fps_update = now;
+            num_frames = 0;
+            string title = "Waterbender- " + to_string((int)fps) + " FPS";
+            glfwSetWindowTitle(window, title.c_str());
+        }
 
         processInput(window, dt);
 
