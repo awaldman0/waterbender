@@ -722,12 +722,6 @@ int main() {
         for (auto* p : particles) {
             p->updatePosition(&grav_vector, &container, &invRotation, &particles, dt);
         }
-        for (auto* p : particles) {
-            if (outofbounds(p)) { //out of bounds
-                auto rnd = []() { return static_cast<float>(rand()) / static_cast<float>(RAND_MAX); };
-                p->center = Vector3D(rnd() * 0.2f - 0.1f, rnd() * 0.2f - 0.1f, rnd() * 0.2f - 0.1f);
-            }
-        }
 
         // Update visuals
         updateFluidMesh(dt);
