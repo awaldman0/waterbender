@@ -1,4 +1,4 @@
-// main.cpp — Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
+// main.cpp - Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
 // Adds toggle: press 'P' to switch between shaded mesh and raw particle points.
 // GL 3.3 core (no immediate mode). Requires: GLEW, GLFW, GLM, your container.h, particle.h.
 
@@ -143,7 +143,7 @@ out vec4 FragColor;
 void main(){ FragColor = vec4(1.0); }
 )";
 
-// Particle points (GL_POINTS) — core profile compliant
+// Particle points (GL_POINTS) ?core profile compliant
 static const char* VS_points = R"(
 #version 330 core
 layout (location=0) in vec3 aPos;
@@ -571,7 +571,18 @@ void processInput(GLFWwindow* window, float dt)
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) rotationMatrix = glm::rotate(rotationMatrix, glm::radians(speed), glm::vec3(0, 1, 0));
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) rotationMatrix = glm::rotate(rotationMatrix, glm::radians(speed), glm::vec3(1, 0, 0));
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) rotationMatrix = glm::rotate(rotationMatrix, glm::radians(-speed), glm::vec3(1, 0, 0));
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) rotationMatrix = glm::mat4(1.0f);
+
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+      rotationMatrix = glm::mat4(1.0f);
+      container.resetSize();
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) container.setWidth(container.width + 0.0005f);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) container.setWidth(container.width - 0.0005f);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) container.setHeight(container.height + 0.0005f);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) container.setHeight(container.height - 0.0005f);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) container.setLength(container.length + 0.0005f);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) container.setLength(container.length - 0.0005f);
 
     // 'P' edge toggle for particle view
     static bool pPrev = false;
@@ -761,6 +772,9 @@ int main() {
         glUseProgram(progLines);
         glUniformMatrix4fv(uRot_lines, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
         glBindVertexArray(containerVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, containerVBO);
+        glBufferData(GL_ARRAY_BUFFER, container.vertices.size() * sizeof(float),
+          container.vertices.data(), GL_STATIC_DRAW);
         glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(container.vertices.size() / 3));
         glBindVertexArray(0);
 

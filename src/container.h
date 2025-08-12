@@ -1,7 +1,7 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
-#pragma once
+//#pragma once
 
 #include "CGL/CGL.h"
 using namespace std;
@@ -12,6 +12,8 @@ public:
 	float length;
 	float height;
 	float width;
+
+	const float minimumDis = 0.05f;
 
 	std::vector<float> vertices;
 
@@ -24,29 +26,57 @@ public:
 	Vector3D p7;
 	Vector3D p8;
 
-
 	Container() {
 		this->length = 1;
 		this->height = 1;
 		this->width = 1;
-		this->p1 = Vector3D(-0.5f, 0.5f, 0.5f);
-		this->p2 = Vector3D(0.5f, 0.5f, 0.5f);
-		this->p3 = Vector3D(0.5f, -0.5f, 0.5f);
-		this->p4 = Vector3D(-0.5f, -0.5f, 0.5f);
+		calculateVertices();
+	}
 
-		this->p5 = Vector3D(-0.5f, 0.5f, -0.5f);
-		this->p6 = Vector3D(0.5f, 0.5f, -0.5f);
-		this->p7 = Vector3D(0.5f, -0.5f, -0.5f);
-		this->p8 = Vector3D(-0.5f, -0.5f, -0.5f);
+	void setLength(float l) {
+		this->length = std::max(l, minimumDis);
+		calculateVertices();
+	}
+
+	void setWidth(float w) {
+		this->width = std::max(w, minimumDis);
+		calculateVertices();
+	}
+
+	void setHeight(float h) {
+		this->height = std::max(h, minimumDis);
+		calculateVertices();
+	}
+
+	void resetSize() {
+		this->length = 1;
+		this->height = 1;
+		this->width = 1;
+		calculateVertices();
+	}
+
+protected:
+	void calculateVertices() {
+		float x = this->width * 0.5f;
+		float y = this->height * 0.5f;
+		float z = this->length * 0.5f;
+
+		this->p1 = Vector3D(-x, y, z);
+		this->p2 = Vector3D(x, y, z);
+		this->p3 = Vector3D(x, -y, z);
+		this->p4 = Vector3D(-x, -y, z);
+
+		this->p5 = Vector3D(-x, y, -z);
+		this->p6 = Vector3D(x, y, -z);
+		this->p7 = Vector3D(x, -y, -z);
+		this->p8 = Vector3D(-x, -y, -z);
 
 		vertices_setup();
 	}
 
-	void setLength(float l);
-	void setWidth(float w);
-	void setHeight(float h);
-protected:
 	void vertices_setup() {
+		this->vertices.clear();
+
 		//front face edges
 		this->vertices.push_back(this->p1.x);
 		this->vertices.push_back(this->p1.y);
