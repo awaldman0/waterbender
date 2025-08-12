@@ -143,7 +143,7 @@ out vec4 FragColor;
 void main(){ FragColor = vec4(1.0); }
 )";
 
-// Particle points (GL_POINTS) ?core profile compliant
+// Particle points (GL_POINTS) - core profile compliant
 static const char* VS_points = R"(
 #version 330 core
 layout (location=0) in vec3 aPos;
