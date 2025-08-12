@@ -1,4 +1,4 @@
-// main.cpp - Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
+// main.cpp — Fluid mesh (lagged kNN triangles) + box + MODERATE bloom with -30% intensity
 // Adds toggle: press 'P' to switch between shaded mesh and raw particle points.
 // GL 3.3 core (no immediate mode). Requires: GLEW, GLFW, GLM, your container.h, particle.h.
 
@@ -25,10 +25,10 @@ using std::vector;
 using std::string;
 
 // ---------------- Parameters ----------------
-int   num_particles = 125;
-float particle_radius = 0.06f;
+int   num_particles = 512;
+float particle_radius = 0.04f;
 float drawing_radius = 0.02f;
-glm::vec3 gravity = glm::vec3(0.0f, -0.001f, 0.0f);
+glm::vec3 gravity = glm::vec3(0.0f, -.000005f, 0.0f);
 
 int   k_neighbors = 4;
 float max_edge_dist = 0.35f;
@@ -143,7 +143,7 @@ out vec4 FragColor;
 void main(){ FragColor = vec4(1.0); }
 )";
 
-// Particle points (GL_POINTS) ?core profile compliant
+// Particle points (GL_POINTS) — core profile compliant
 static const char* VS_points = R"(
 #version 330 core
 layout (location=0) in vec3 aPos;
@@ -562,6 +562,27 @@ void framebufferSizeChanged(GLFWwindow*, int w, int h) {
     makeHDRFBO(w, h);
     makePingPong(bloomW, bloomH);
 }
+bool outofbounds(Particle* p) {
+    if (p->center.x + p->radius > container.width) {
+        return true;
+    }
+    else if (p->center.x - p->radius < -(container.width)) {
+        return true;
+    }
+    else if (p->center.y + p->radius > container.height) {
+        return true;
+    }
+    else if (p->center.y - p->radius < -(container.height)) {
+        return true;
+    }
+    else if (p->center.z + p->radius > container.length) {
+        return true;
+    }
+    else if (p->center.z - p->radius < -(container.length)) {
+        return true;
+    }
+    return false;
+}
 
 // ---------------- Input per-frame ----------------
 void processInput(GLFWwindow* window, float dt)
@@ -709,7 +730,7 @@ int main() {
             fps = (float)num_frames / (now - last_fps_update);
             last_fps_update = now;
             num_frames = 0;
-            string title = "Waterbender" + std::to_string((int)fps) + " FPS";
+            string title = "Waterbender " + std::to_string((int)fps) + " FPS";
             glfwSetWindowTitle(window, title.c_str());
         }
 
@@ -718,8 +739,15 @@ int main() {
         // Physics
         glm::mat4 invRotation = glm::transpose(rotationMatrix);
         glm::vec4 grav_vector = invRotation * glm::vec4(gravity, 1.0f);
+
         for (auto* p : particles) {
             p->updatePosition(&grav_vector, &container, &invRotation, &particles, dt);
+        }
+        for (auto* p : particles) {
+            if (outofbounds(p)) { //out of bounds
+                auto rnd = []() { return static_cast<float>(rand()) / static_cast<float>(RAND_MAX); };
+                p->center = Vector3D(rnd() * 0.2f - 0.1f, rnd() * 0.2f - 0.1f, rnd() * 0.2f - 0.1f);
+            }
         }
 
         // Update visuals
