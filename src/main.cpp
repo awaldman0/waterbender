@@ -562,27 +562,6 @@ void framebufferSizeChanged(GLFWwindow*, int w, int h) {
     makeHDRFBO(w, h);
     makePingPong(bloomW, bloomH);
 }
-bool outofbounds(Particle* p) {
-    if (p->center.x + p->radius > container.width) {
-        return true;
-    }
-    else if (p->center.x - p->radius < -(container.width)) {
-        return true;
-    }
-    else if (p->center.y + p->radius > container.height) {
-        return true;
-    }
-    else if (p->center.y - p->radius < -(container.height)) {
-        return true;
-    }
-    else if (p->center.z + p->radius > container.length) {
-        return true;
-    }
-    else if (p->center.z - p->radius < -(container.length)) {
-        return true;
-    }
-    return false;
-}
 
 // ---------------- Input per-frame ----------------
 void processInput(GLFWwindow* window, float dt)
