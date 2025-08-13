@@ -1,11 +1,10 @@
-A template for GLFW + GLEW + GLM + OpenGL projects that builds on Linux, Mac, and Windows using CMake.
+Waterbender is an OpenGL based real-time particle-based fluid simulation that builds on Linux, Mac, and Windows using CMake.
 
-GLFW, GLEW, and GLM are automatically downloaded from GitHub and compiled (in case of GLFW). There's no need to install any other libraries, except for Mesa and X11 (or Wayland) dev packages on Linux.
-
-[![Video](/output.gif)](https://www.youtube.com/watch?v=dA991DBSZh4)
-
-Full Tutorial: https://www.youtube.com/watch?v=dA991DBSZh4
-
----
-Check out the blog for more! [www.onlyfastcode.com](https://www.onlyfastcode.com)
----
+Controls:
+P: Toggle between particle rendering mode and mesh rendering mode
+Arrow keys/mouse: Rotate the bounding box in the x and y axis
+R: reset orientation of the bounding box
+Q/A: expand/contract the bounding box in the x axis
+W/S: expand/contract the bounding box in the y axis
+E/D: expand/contract the bounding box in the z axis
+Scroll up/down: add/remove particles from the simulation
