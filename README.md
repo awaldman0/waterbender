@@ -9,14 +9,13 @@ Controls:
 - E/D: expand/contract the bounding box in the z axis
 - Scroll up/down: add/remove particles from the simulation
 
-
-https://github.com/user-attachments/assets/0c8cb368-1172-4c28-87c9-577d99124d40
-
-
-
-https://github.com/user-attachments/assets/e291a63c-b117-4518-9f13-57f71467d2b8
+https://github.com/user-attachments/assets/2ed39e69-3ee2-42bb-97b5-1baec15fe6ba
 
 
 
-https://github.com/user-attachments/assets/a53720a9-3221-4431-a4a5-5c7e317c1c58
+https://github.com/user-attachments/assets/a5ed1c9a-0306-4df7-accd-f74e00f2d60b
+
+
+
+https://github.com/user-attachments/assets/79fe687f-9a22-4e03-b9ff-192dcb3a87d1
 
